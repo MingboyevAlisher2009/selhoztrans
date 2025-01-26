@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import {
+  ArrowLeft,
   CalendarIcon,
   File,
   ImageOff,
@@ -36,7 +37,7 @@ import { format, isAfter, startOfDay } from "date-fns";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import useUsers from "@/store/use-users";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   Sheet,
   SheetContent,
@@ -65,6 +66,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import useAuth from "@/store/use-auth";
 
 const Group = () => {
   const [isStudentsOpen, setisStudentsOpen] = useState(false);
@@ -77,9 +79,12 @@ const Group = () => {
   const [members, setMembers] = useState([]);
   const [userId, setUserId] = useState(null);
   const [topics, setTopics] = useState([]);
+
   const { users, getUsers } = useUsers();
+  const { userInfo } = useAuth();
   const inputRef = useRef();
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const toggleModal = () => setIsOpen(!isOpen);
   const toggleStudents = () => setisStudentsOpen(!isStudentsOpen);
@@ -257,6 +262,11 @@ const Group = () => {
 
   return (
     <>
+      {userInfo.role === "STUDENT" && (
+        <div onClick={() => navigate("/")} className="mt-5 ml-3 cursor-pointer">
+          <ArrowLeft />
+        </div>
+      )}
       <div className="container mx-auto max-w-4xl md:max-w-6xl px-4 py-4 sm:py-6">
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
           <div className="w-full group relative lg:w-[300px]">
@@ -325,35 +335,38 @@ const Group = () => {
             >
               Topics
             </motion.h2>
-            <div className="flex flex-wrap gap-2">
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-              >
-                <Button
-                  onClick={toggleAddModal}
-                  variant="default"
-                  size="sm"
-                  className="group"
-                >
-                  <Plus className="w-4 h-4 mr-1 transition-transform duration-200 group-hover:rotate-90" />
-                  Add Topic
-                </Button>
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-              >
-                <Button
-                  onClick={toggleStudents}
-                  variant="default"
-                  size="sm"
-                  className="group"
-                >
-                  Students
-                </Button>
-              </motion.div>
-            </div>
+            {(userInfo && userInfo.role === "ADMIN") ||
+              (userInfo.role === "SUPER_ADMIN" && (
+                <div className="flex flex-wrap gap-2">
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                  >
+                    <Button
+                      onClick={toggleAddModal}
+                      variant="default"
+                      size="sm"
+                      className="group"
+                    >
+                      <Plus className="w-4 h-4 mr-1 transition-transform duration-200 group-hover:rotate-90" />
+                      Add Topic
+                    </Button>
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                  >
+                    <Button
+                      onClick={toggleStudents}
+                      variant="default"
+                      size="sm"
+                      className="group"
+                    >
+                      Students
+                    </Button>
+                  </motion.div>
+                </div>
+              ))}
           </div>
           <div className="space-y-5">
             {topics &&

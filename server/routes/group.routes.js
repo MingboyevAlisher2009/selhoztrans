@@ -34,9 +34,9 @@ router.post(
 );
 router.get("/get-groups", AuthMiddleware, AdminsMiddleware, getGroups);
 
-router.get("/:id", AuthMiddleware, AdminsMiddleware, getGroup);
+router.get("/:id", AuthMiddleware, getGroup);
 
-router.get("/topics/:id", AuthMiddleware, AdminsMiddleware, getTopics);
+router.get("/topics/:id", AuthMiddleware, getTopics);
 
 router.delete("/:id", AuthMiddleware, AdminsMiddleware, deleteGroupORMember);
 

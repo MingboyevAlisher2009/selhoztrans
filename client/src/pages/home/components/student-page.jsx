@@ -120,10 +120,9 @@ const StudentPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl space-y-8">
-      {/* Profile Header */}
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-3xl" />
-        <div className="=]['/=]}+-{o0.,} flex flex-col lg:flex-row items-center gap-8 p-8 rounded-3xl bg-card">
+        <div className="flex flex-col lg:flex-row items-center gap-8 p-8 rounded-3xl bg-card">
           <div
             className="relative group"
             onMouseEnter={() => setIsHovering(true)}
@@ -214,7 +213,6 @@ const StudentPage = () => {
         </div>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, index) => (
           <motion.div
@@ -238,7 +236,6 @@ const StudentPage = () => {
         ))}
       </div>
 
-      {/* Groups Section */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold">Your Groups</h2>
@@ -256,6 +253,8 @@ const StudentPage = () => {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.1 }}
+                onClick={() => navigate(`/group/${group._id}`)}
+                className="cursor-pointer"
               >
                 <Card className="group hover:shadow-lg transition-shadow duration-300">
                   <div className="relative aspect-video rounded-t-lg overflow-hidden">
@@ -302,7 +301,6 @@ const StudentPage = () => {
         </div>
       </div>
 
-      {/* Today's Activity */}
       {userInfo.attendance?.today && userInfo.attendance.today.length > 0 && (
         <div className="space-y-6">
           <h2 className="text-2xl font-bold">Today's Activity</h2>
