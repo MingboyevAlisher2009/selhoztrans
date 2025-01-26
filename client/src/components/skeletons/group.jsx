@@ -48,23 +48,22 @@ export default function GroupSkeleton() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="space-y-5">
           {Array.from({ length: 6 }).map((_, index) => (
-            <Card key={index} className="overflow-hidden">
-              <CardHeader className="p-0">
-                <Skeleton className="w-full h-48 max-w-full" />
+            <Card key={index} className="overflow-hidden p-5">
+              <CardHeader>
+                <Skeleton className="w-52 h-6 max-w-full" />
               </CardHeader>
               <CardContent className="p-4 sm:p-6 space-y-4">
                 <div className="space-y-2">
                   <Skeleton className="h-6 w-3/4 max-w-full" />
                   <Skeleton className="h-6 w-32 max-w-full" />
                 </div>
-                <div className="flex gap-2">
-                  <Skeleton className="h-5 w-20 max-w-full" />
-                  <Skeleton className="h-5 w-24 rounded-full max-w-full" />
-                </div>
                 <Separator />
-                <Skeleton className="h-9 w-full max-w-full" />
+                <div className="flex justify-between">
+                  <Skeleton className="h-9 w-52 max-w-full" />
+                  <Skeleton className="h-9 w-52 max-w-full" />
+                </div>
               </CardContent>
             </Card>
           ))}

@@ -1,6 +1,6 @@
 import Attending from "../models/attending.model.js";
 import Group from "../models/group.model.js";
-import { existsSync, renameSync, unlinkSync } from "fs";
+import { existsSync, mkdirSync, renameSync, unlinkSync } from "fs";
 import User from "../models/user.model.js";
 import mongoose from "mongoose";
 import Topics from "../models/topics.model.js";
@@ -254,7 +254,7 @@ export const addTopic = async (req, res, next) => {
 
     if (file) {
       try {
-        if (!existsSync(imageUrl)) {
+        if (!existsSync(file)) {
           return errorResponse(res, 400, {
             status: "error",
             message: "Image file not found",
@@ -279,20 +279,25 @@ export const addTopic = async (req, res, next) => {
 export const addGroupImage = async (req, res, next) => {
   try {
     if (!req.file) {
-      return errorResponse(res, 400, "File are required");
+      return errorResponse(res, 400, "File is required");
     }
+
     let fileName;
     const date = Date.now();
+    const dirPath = `uploads/groups/${date}`;
 
-    if (validateImage(req.file)) {
-      return (fileName = `uploads/groups/${date}-${req.file.originalname}`);
+    if (!existsSync(dirPath)) {
+      mkdirSync(dirPath, { recursive: true });
     }
 
-    fileName = `uploads/groups/${date}/${req.file.originalname}`;
+    fileName = `${dirPath}/${req.file.originalname}`;
 
     try {
+      console.log(req.file);
+
       renameSync(req.file.path, fileName);
     } catch (error) {
+      console.error("Error renaming file:", error);
       return errorResponse(res, 500, "Error saving image");
     }
 
@@ -314,24 +319,24 @@ export const addGroupImage = async (req, res, next) => {
     }
 
     if (req.body.topicId) {
-      const group = await Topics.findByIdAndUpdate(
+      const topic = await Topics.findByIdAndUpdate(
         req.body.topicId,
         { file: fileName },
         { new: true, runValidators: true }
       );
 
-      if (!group) {
+      if (!topic) {
         unlinkSync(fileName);
-        return errorResponse(res, 404, "Group not found");
+        return errorResponse(res, 404, "Topic not found");
       }
     }
 
     return successResponse(res, 200, {
       imageUrl: fileName,
-      message: "Profile image updated successfully",
+      message: "Image updated successfully",
     });
   } catch (error) {
-    console.error("Add profile image error:", error);
+    console.error("Add image error:", error);
     if (req.file && existsSync(req.file.path)) {
       unlinkSync(req.file.path);
     }

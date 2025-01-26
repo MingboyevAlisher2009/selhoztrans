@@ -36,7 +36,7 @@ router.get("/get-groups", AuthMiddleware, AdminsMiddleware, getGroups);
 
 router.get("/:id", AuthMiddleware, AdminsMiddleware, getGroup);
 
-router.get("topics/:id", AuthMiddleware, AdminsMiddleware, getTopics);
+router.get("/topics/:id", AuthMiddleware, AdminsMiddleware, getTopics);
 
 router.delete("/:id", AuthMiddleware, AdminsMiddleware, deleteGroupORMember);
 
