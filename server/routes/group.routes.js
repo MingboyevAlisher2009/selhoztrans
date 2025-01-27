@@ -8,6 +8,7 @@ import {
   createGroup,
   deleteGroupImage,
   deleteGroupORMember,
+  deleteTopic,
   getGroup,
   getGroups,
   getTopics,
@@ -39,6 +40,8 @@ router.get("/:id", AuthMiddleware, getGroup);
 router.get("/topics/:id", AuthMiddleware, getTopics);
 
 router.delete("/:id", AuthMiddleware, AdminsMiddleware, deleteGroupORMember);
+
+router.delete("/topic/:id", AuthMiddleware, AdminsMiddleware, deleteTopic);
 
 router.delete(
   "/remove-group-image/:id",

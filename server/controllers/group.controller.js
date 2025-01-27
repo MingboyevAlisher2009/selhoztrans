@@ -581,6 +581,24 @@ export const deleteGroupORMember = async (req, res, next) => {
   }
 };
 
+export const deleteTopic = async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    if (!id) {
+      return errorResponse(res, 400, "ID requred");
+    }
+    const data = await Topics.findByIdAndDelete(id);
+
+    if (data.file) {
+      cleanupFile(data.file);
+    }
+
+    successResponse(res, 200, "Topic deleted succesfully");
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const deleteGroupImage = async (req, res, next) => {
   try {
     const { id } = req.params;

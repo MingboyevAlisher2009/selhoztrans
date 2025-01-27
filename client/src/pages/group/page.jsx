@@ -6,10 +6,11 @@ import {
   ImageOff,
   ImagePlus,
   LinkIcon,
+  MoreVertical,
   Plus,
   Trash,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import DeleteModal from "@/components/delete-modal";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -67,6 +68,12 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import useAuth from "@/store/use-auth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Group = () => {
   const [isStudentsOpen, setisStudentsOpen] = useState(false);
@@ -74,11 +81,12 @@ const Group = () => {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isAddTopic, setisAddTopic] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [previewUrl, setPreviewUrl] = useState();
   const [isOpen, setIsOpen] = useState(false);
   const [members, setMembers] = useState([]);
   const [userId, setUserId] = useState(null);
+  const [topicId, setTopicId] = useState();
   const [topics, setTopics] = useState([]);
+  const [isTopic, setIsTopic] = useState(false);
 
   const { users, getUsers } = useUsers();
   const { userInfo } = useAuth();
@@ -86,9 +94,10 @@ const Group = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const toggleModal = () => setIsOpen(!isOpen);
   const toggleStudents = () => setisStudentsOpen(!isStudentsOpen);
   const toggleAddModal = () => setisAddTopic(!isAddTopic);
+  const toggleTopicModal = () => setIsTopic(!isTopic);
+  const toggleModal = () => setIsOpen(!isOpen);
   const toggleDeleteModal = (id) => {
     setUserId(id);
     setIsDeleteOpen(!isDeleteOpen);
@@ -216,6 +225,18 @@ const Group = () => {
     },
   });
 
+  const { mutate: deleteTopic, isPending: isDeleteTopic } = useMutation({
+    mutationFn: async () => {
+      const { data } = await axiosIntense.delete(`/group/topic/${topicId}`);
+      return data;
+    },
+    onSuccess: () => {
+      getTopics();
+      toggleTopicModal();
+      toast("Topic deleted succesfully");
+    },
+  });
+
   useEffect(() => {
     mutate();
     getUsers();
@@ -262,7 +283,7 @@ const Group = () => {
 
   return (
     <>
-      {userInfo.role === "STUDENT" && (
+      {userInfo && userInfo.role === "STUDENT" && (
         <div onClick={() => navigate("/")} className="mt-5 ml-3 cursor-pointer">
           <ArrowLeft />
         </div>
@@ -336,7 +357,7 @@ const Group = () => {
               Topics
             </motion.h2>
             {(userInfo && userInfo.role === "ADMIN") ||
-              (userInfo.role === "SUPER_ADMIN" && (
+              (userInfo && userInfo.role === "SUPER_ADMIN" && (
                 <div className="flex flex-wrap gap-2">
                   <motion.div
                     initial={{ opacity: 0, x: 20 }}
@@ -368,46 +389,104 @@ const Group = () => {
                 </div>
               ))}
           </div>
-          <div className="space-y-5">
+          <AnimatePresence>
             {topics &&
-              topics.map((item, i) => (
-                <Card className="p-5 border shadow-md rounded-2xl transition-all hover:shadow-lg">
-                  <CardHeader className="mb-4">
-                    <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {item.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardDescription className="text-gray-700 dark:text-gray-400 mb-6 leading-relaxed">
-                    {item.description}
-                  </CardDescription>
-                  <Separator className="my-4" />
-                  <CardFooter className="flex items-center justify-between gap-4">
-                    {item.file && (
-                      <a
-                        href={item.file}
-                        download
-                        className="flex items-center line-clamp-1 gap-2 p-3 bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                      >
-                        <File />
-                        <span className="text-sm font-medium truncate">
-                          {item.file.split("/").pop()}
-                        </span>
-                      </a>
+              topics.map((topic, i) => (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="group"
+                >
+                  <Card
+                    key={i}
+                    className="relative overflow-hidden border-muted/30 transition-all duration-300 hover:shadow-lg hover:border-primary/20 hover:-translate-y-1"
+                  >
+                    <div className="absolute right-2 top-2">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            className="text-destructive focus:text-destructive"
+                            onClick={() => {
+                              setTopicId(topic._id);
+                              toggleTopicModal();
+                            }}
+                          >
+                            <Trash className="mr-2 h-4 w-4" />
+                            Delete topic
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+
+                    <CardHeader>
+                      <CardTitle className="text-xl font-semibold line-clamp-1">
+                        {topic.title}
+                      </CardTitle>
+                    </CardHeader>
+
+                    <CardContent>
+                      <p className="text-muted-foreground line-clamp-3">
+                        {topic.description}
+                      </p>
+                    </CardContent>
+
+                    {(topic.file || topic.link) && (
+                      <>
+                        <Separator className="my-4" />
+                        <CardFooter className="flex items-center gap-3">
+                          {topic.file && (
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              className="flex-1"
+                              asChild
+                            >
+                              <a
+                                href={topic.file}
+                                download
+                                className="flex items-center gap-2"
+                              >
+                                <File className="h-4 w-4" />
+                                <span className="line-clamp-1">
+                                  {topic.file.split("/").pop()}
+                                </span>
+                              </a>
+                            </Button>
+                          )}
+                          {topic.link && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="flex-1"
+                              asChild
+                            >
+                              <Link
+                                to={topic.link}
+                                target="_blank"
+                                className="flex items-center gap-2"
+                              >
+                                <LinkIcon className="h-4 w-4" />
+                                Open Link
+                              </Link>
+                            </Button>
+                          )}
+                        </CardFooter>
+                      </>
                     )}
-                    {item.link && (
-                      <Link
-                        to={item.link}
-                        target="_blank"
-                        className="px-4 py-2 text-sm font-medium flex gap-3 rounded-lg shadow-md "
-                      >
-                        <LinkIcon />
-                        Open Link
-                      </Link>
-                    )}
-                  </CardFooter>
-                </Card>
+                  </Card>
+                </motion.div>
               ))}
-          </div>
+          </AnimatePresence>
         </div>
       </div>
 
@@ -599,6 +678,13 @@ const Group = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <DeleteModal
+        isOpen={isTopic}
+        isPending={isDeleteTopic}
+        onOpenChange={toggleTopicModal}
+        onConfirm={deleteTopic}
+      />
 
       <DeleteModal
         isOpen={isDeleteOpen}
