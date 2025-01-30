@@ -2,7 +2,13 @@
 
 import * as React from "react";
 import { cva } from "class-variance-authority";
-import { CheckIcon, XCircle, ChevronDown, XIcon, WandSparkles } from 'lucide-react';
+import {
+  CheckIcon,
+  XCircle,
+  ChevronDown,
+  XIcon,
+  WandSparkles,
+} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
@@ -22,7 +28,6 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
-
 
 const multiSelectVariants = cva(
   "m-1 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300",
@@ -64,6 +69,13 @@ export const MultiSelect = React.forwardRef(
     const [selectedValues, setSelectedValues] = React.useState(defaultValue);
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
     const [isAnimating, setIsAnimating] = React.useState(false);
+    const [searchQuery, setSearchQuery] = React.useState("");
+
+    const filteredOptions = React.useMemo(() => {
+      return options.filter((option) =>
+        option.username.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }, [options, searchQuery]);
 
     const handleInputKeyDown = (event) => {
       if (event.key === "Enter") {
@@ -127,7 +139,7 @@ export const MultiSelect = React.forwardRef(
                         const option = users.find(
                           (o) => o._id.toString() === value.toString()
                         );
-                        return (
+                        return option ? (
                           <Badge
                             key={value}
                             className={cn(
@@ -140,7 +152,7 @@ export const MultiSelect = React.forwardRef(
                                 : undefined
                             }
                           >
-                            {option?.username}
+                            {option.username}
                             <XCircle
                               className="ml-2 h-4 w-4 cursor-pointer"
                               onClick={(e) => {
@@ -149,7 +161,7 @@ export const MultiSelect = React.forwardRef(
                               }}
                             />
                           </Badge>
-                        );
+                        ) : null;
                       })}
                       {selectedValues.length > maxCount && (
                         <Badge
@@ -210,20 +222,22 @@ export const MultiSelect = React.forwardRef(
               <CommandInput
                 placeholder="Search..."
                 onKeyDown={handleInputKeyDown}
+                value={searchQuery}
+                onValueChange={setSearchQuery}
               />
               <CommandList>
                 <CommandEmpty>No results found.</CommandEmpty>
                 <CommandGroup>
-                  {options.map((option, i) => {
+                  {filteredOptions.map((option, i) => {
                     return (
                       <CommandItem
-                        key={i}
+                        key={option._id}
                         onSelect={() => toggleOption(option._id)}
                         className="cursor-pointer"
                       >
-                        <span>
-                          {i + 1}. {option.username}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span>{i + 1}. {option.username}</span>
+                        </div>
                       </CommandItem>
                     );
                   })}
@@ -272,6 +286,3 @@ export const MultiSelect = React.forwardRef(
 );
 
 MultiSelect.displayName = "MultiSelect";
-
-// export  default MultiSelectProps ;
-

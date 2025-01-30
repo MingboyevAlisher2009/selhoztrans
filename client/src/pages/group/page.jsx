@@ -6,9 +6,11 @@ import {
   ImageOff,
   ImagePlus,
   LinkIcon,
+  Loader2,
   MoreVertical,
   Plus,
   Trash,
+  UserPlus,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import DeleteModal from "@/components/delete-modal";
@@ -74,6 +76,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const Group = () => {
   const [isStudentsOpen, setisStudentsOpen] = useState(false);
@@ -642,38 +645,59 @@ const Group = () => {
       <Dialog open={isOpen} onOpenChange={toggleModal}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Add Member</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="flex items-center gap-2">
+              <UserPlus className="h-5 w-5" />
+              Add Members
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground">
               Select members to add to the group. You can add multiple members
               at once.
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4">
-            <MultiSelect
-              onValueChange={setMembers}
-              users={users}
-              defaultValue={data && data.data.members.map((user) => user._id)}
-              options={availableMembers}
-              placeholder="Search and select members..."
-              animation={0.3}
-            />
-          </div>
+          <ScrollArea className="max-h-[60vh]">
+            <div className="space-y-4 py-4">
+              <MultiSelect
+                onValueChange={setMembers}
+                users={users}
+                defaultValue={data && data.data.members?.map((user) => user._id)}
+                options={availableMembers}
+                placeholder="Search and select members..."
+                animation={0.3}
+                modalPopover
+              />
+              {members.length > 0 && (
+                <p className="text-sm text-muted-foreground">
+                  {members.length} member{members.length !== 1 ? "s" : ""}{" "}
+                  selected
+                </p>
+              )}
+            </div>
+          </ScrollArea>
           <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2">
             <Button
               type="button"
               variant="outline"
               onClick={toggleModal}
               className="w-full sm:w-auto"
+              disabled={isAddingMembers}
             >
               Cancel
             </Button>
             <Button
               onClick={addMember}
-              disabled={isAddingMembers}
-              type="submit"
+              disabled={isAddingMembers || members.length === 0}
               className="w-full sm:w-auto"
             >
-              {isAddingMembers ? "Adding..." : "Add Member"}
+              {isAddingMembers ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Adding...
+                </>
+              ) : (
+                <>
+                  Add {members.length > 0 ? `(${members.length})` : "Members"}
+                </>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
