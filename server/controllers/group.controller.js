@@ -29,26 +29,6 @@ const calculateAttendanceSummary = (members) => {
   };
 };
 
-const allowed_file_types = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/gif",
-];
-const max_file_size = 5 * 1024 * 1024;
-
-const validateImage = (file) => {
-  if (!allowed_file_types.includes(file.type)) {
-    return false;
-  }
-
-  if (file.size > max_file_size) {
-    return false;
-  }
-
-  return true;
-};
-
 const cleanupFile = async (filePath) => {
   try {
     if (filePath && existsSync(filePath)) {

@@ -30,6 +30,7 @@ router.post("/topic", AuthMiddleware, AdminsMiddleware, addTopic);
 router.post(
   "/group-image",
   AuthMiddleware,
+  AdminsMiddleware,
   upload.single("group-image"),
   addGroupImage
 );

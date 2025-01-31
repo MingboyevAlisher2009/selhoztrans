@@ -26,12 +26,15 @@ import { toast } from "sonner";
 import axiosIntense from "@/http/axios";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const StudentPage = () => {
   const { userInfo, getUserInfo } = useAuth();
+  const queryClient = useQueryClient();
+
   const fileInputRef = useRef(null);
   const [isHovering, setIsHovering] = useState(false);
-  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const now = Date.now();
 
   const stats = [
@@ -254,7 +257,10 @@ const StudentPage = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Card className="group hover:shadow-lg transition-shadow duration-300">
+                <Card
+                  onClick={() => navigate(`/group/${group._id}`)}
+                  className="group hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+                >
                   <div className="relative aspect-video rounded-t-lg overflow-hidden">
                     {group.imageUrl ? (
                       <img
