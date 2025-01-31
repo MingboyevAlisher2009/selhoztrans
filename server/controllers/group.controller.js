@@ -1,9 +1,10 @@
 import Attending from "../models/attending.model.js";
 import Group from "../models/group.model.js";
-import { existsSync, mkdirSync, renameSync, unlinkSync } from "fs";
+import { existsSync, mkdirSync, readdirSync, renameSync, rmSync, unlinkSync } from "fs";
 import User from "../models/user.model.js";
 import mongoose from "mongoose";
 import Topics from "../models/topics.model.js";
+import path from "path";
 
 const errorResponse = (res, status, message) => {
   return res.status(status).json({
@@ -29,13 +30,25 @@ const calculateAttendanceSummary = (members) => {
   };
 };
 
-const cleanupFile = async (filePath) => {
+const cleanupFile = (filePath) => {
   try {
-    if (filePath && existsSync(filePath)) {
-      unlinkSync(filePath);
+    if (existsSync(filePath)) {
+      rmSync(filePath, { force: true });
+      console.log(`File deleted: ${filePath}`);
+    }
+
+    const folderPath = path.dirname(filePath);
+
+    if (
+      existsSync(folderPath) &&
+      existsSync(folderPath) &&
+      !readdirSync(folderPath).length
+    ) {
+      rmSync(folderPath, { recursive: true, force: true });
+      console.log(`Folder deleted: ${folderPath}`);
     }
   } catch (error) {
-    console.error("File cleanup error:", error);
+    console.error("Cleanup error:", error);
   }
 };
 
