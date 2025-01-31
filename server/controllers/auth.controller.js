@@ -165,7 +165,7 @@ export const userInfo = async (req, res, next) => {
             totalSessions: {
               $ceil: {
                 $divide: [
-                  { $subtract: [now, "$groupInfo.createdAt"] },
+                  { $subtract: [now, "$members.createdAt"] },
                   1000 * 60 * 60 * 24,
                 ],
               },
