@@ -224,14 +224,15 @@ const Modal = ({
 
               <div className="space-y-2">
                 <Label className="text-sm font-medium">Members</Label>
+
                 <MultiSelect
-                  options={availableMembers}
-                  users={users}
                   onValueChange={handleMemberChange}
-                  placeholder="Select members"
-                  animation={1}
-                  maxCount={3}
+                  users={users}
+                  options={availableMembers}
                   value={formData.members}
+                  placeholder="Search and select members..."
+                  animation={0.3}
+                  modalPopover
                 />
               </div>
             </div>
