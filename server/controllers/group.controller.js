@@ -1,6 +1,13 @@
 import Attending from "../models/attending.model.js";
 import Group from "../models/group.model.js";
-import { existsSync, mkdirSync, readdirSync, renameSync, rmSync, unlinkSync } from "fs";
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  renameSync,
+  rmSync,
+  unlinkSync,
+} from "fs";
 import User from "../models/user.model.js";
 import mongoose from "mongoose";
 import Topics from "../models/topics.model.js";
@@ -343,7 +350,7 @@ export const getGroups = async (req, res, next) => {
       ...(req.user.role === "ADMIN", { author: req.userId }),
     })
       .populate({ path: "author", select: "-password" })
-      .populate("members");
+      .populate({ path: "members", select: "-password" });
 
     if (!groups) {
       return errorResponse(res, 404, "Groups not found");
@@ -484,6 +491,20 @@ export const getTopics = async (req, res, next) => {
     return successResponse(res, 200, data);
   } catch (error) {
     console.error("Get topic error:", error);
+    next(error);
+  }
+};
+
+export const updateGroup = async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    await Group.findByIdAndUpdate(id, req.body, {
+      new: true,
+    });
+
+    successResponse(res, 201, "Group updated succefully");
+  } catch (error) {
+    console.error("Update group error:", error);
     next(error);
   }
 };

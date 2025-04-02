@@ -1,21 +1,22 @@
-"use client";
+import { useEffect, useMemo, useCallback, useState } from "react";
+import { Group, Plus } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 
-import { useEffect, useMemo } from "react";
-import { Group, Loader, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import DeleteModal from "@/components/delete-modal";
+import HomeCardSkeleton from "@/components/skeletons/home-card";
+
 import CourseCard from "./components/card";
 import Modal from "./components/modal";
-import DeleteModal from "@/components/delete-modal";
-import { useCallback, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
-import axiosIntense from "@/http/axios";
-import HomeCardSkeleton from "@/components/skeletons/home-card";
-import useUsers from "@/store/use-users";
-import { toast } from "sonner";
-import useAuth from "@/store/use-auth";
+import UpdateModal from "./components/update-modal";
 import StudentPage from "./components/student-page";
 
-const initialFormState = {
+import axiosIntense from "@/http/axios";
+import useUsers from "@/store/use-users";
+import useAuth from "@/store/use-auth";
+
+const INITIAL_FORM_STATE = {
   title: "",
   image: null,
   members: [],
@@ -25,13 +26,19 @@ const initialFormState = {
 };
 
 export default function Home() {
-  const [modals, setModals] = useState({ create: false, delete: false });
-  const [formData, setFormData] = useState(initialFormState);
+  const [modals, setModals] = useState({
+    create: false,
+    delete: false,
+    edit: false,
+  });
+  const [formData, setFormData] = useState(INITIAL_FORM_STATE);
   const [previewUrl, setPreviewUrl] = useState("");
   const [courses, setCourses] = useState([]);
+  const [groupId, setGroupId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
   const { getUsers, users } = useUsers();
   const { userInfo } = useAuth();
-  const [groupId, setGroupId] = useState(null);
 
   const toggleModal = useCallback((modalType) => {
     setModals((prev) => ({
@@ -46,6 +53,7 @@ export default function Home() {
     if (id === "image" && files?.[0]) {
       const file = files[0];
       setFormData((prev) => ({ ...prev, image: file }));
+
       const reader = new FileReader();
       reader.onloadend = () => setPreviewUrl(reader.result);
       reader.readAsDataURL(file);
@@ -55,13 +63,7 @@ export default function Home() {
   }, []);
 
   const handleSelectChange = useCallback((field, value) => {
-    if (field === "members") {
-      setFormData((prev) => ({ ...prev, members: value }));
-    } else if (field === "level") {
-      setFormData((prev) => ({ ...prev, level: value }));
-    } else if (field === "achievement") {
-      setFormData((prev) => ({ ...prev, achievement: value }));
-    }
+    setFormData((prev) => ({ ...prev, [field]: value }));
   }, []);
 
   const isFormValid = useMemo(() => {
@@ -80,15 +82,9 @@ export default function Home() {
       setCourses(data.data || []);
     },
     onError: (error) => {
-      console.log(error);
+      console.error("Failed to fetch groups:", error);
     },
   });
-
-  useEffect(() => {
-    if (userInfo && userInfo.role === "STUDENT") return;
-    fetchGroups();
-    getUsers();
-  }, [fetchGroups, getUsers]);
 
   const { mutate: addGroup, isPending: isCreating } = useMutation({
     mutationFn: async (data) => {
@@ -97,12 +93,12 @@ export default function Home() {
     onSuccess: () => {
       fetchGroups();
       toggleModal("create");
-      setFormData(initialFormState);
-      setPreviewUrl(null);
-      toast.success("Group created successfully");
+      setFormData(INITIAL_FORM_STATE);
+      setPreviewUrl("");
+      toast.success("Guruh muvaffaqiyatli yaratildi");
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || "Failed to create group");
+      toast.error(error.response?.data?.message || "Guruh yaratib bo‘lmadi");
     },
   });
 
@@ -114,34 +110,79 @@ export default function Home() {
     onSuccess: () => {
       fetchGroups();
       toggleModal("delete");
-      toast.success("Group deleted successfully");
+      toast.success("Guruh muvaffaqiyatli oʻchirildi");
+    },
+    onError: (error) => {
+      toast.error("Guruhni o‘chirib bo‘lmadi");
     },
   });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      let imageUrl;
-      console.log(formData.image);
-      if (formData.image) {
-        const imageData = new FormData();
-        imageData.append("group-image", formData.image);
-        const { data } = await axiosIntense.post(
-          "/group/group-image",
-          imageData
-        );
-        imageUrl = data.data.imageUrl;
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      try {
+        let imageUrl;
+
+        if (formData.image && formData.image instanceof File) {
+          const imageData = new FormData();
+          imageData.append("group-image", formData.image);
+          const { data } = await axiosIntense.post(
+            "/group/group-image",
+            imageData
+          );
+          imageUrl = data.data.imageUrl;
+        }
+
+        addGroup({ ...formData, imageUrl });
+      } catch (error) {
+        toast.error("Failed to upload image");
       }
+    },
+    [formData, addGroup]
+  );
 
-      addGroup({ ...formData, imageUrl });
-    } catch (error) {
-      toast.error("Failed to upload image");
-    }
-  };
+  const handleEdit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      setIsLoading(true);
+      try {
+        await axiosIntense.put(`/group/${groupId}`, formData);
+        fetchGroups();
+        toggleModal("edit");
+        setFormData(INITIAL_FORM_STATE);
+        toast.success("Guruh muvaffaqiyatli yangilandi");
+      } catch (error) {
+        toast.error("Nimadir noto'g'ri ketdi");
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [formData, addGroup]
+  );
 
-  if (userInfo && userInfo.role === "STUDENT") {
-    return <StudentPage />;
-  }
+  const handleEditCourse = useCallback(
+    (course) => {
+      setGroupId(course._id);
+      toggleModal("edit");
+      setFormData({
+        title: course.title,
+        image: course.image,
+        achievement: course.achievement,
+        description: course.description,
+        level: course.level,
+        members: course.members,
+      });
+    },
+    [toggleModal]
+  );
+
+  const handleDeleteCourse = useCallback(
+    (courseId) => {
+      setGroupId(courseId);
+      toggleModal("delete");
+    },
+    [toggleModal]
+  );
 
   const availableMembers = useMemo(() => {
     if (!users) return [];
@@ -150,9 +191,20 @@ export default function Home() {
     );
   }, [users, formData.members]);
 
+  useEffect(() => {
+    if (userInfo && userInfo.role === "STUDENT") return;
+    fetchGroups();
+    getUsers();
+  }, [fetchGroups, getUsers, userInfo]);
+
+  if (userInfo && userInfo.role === "STUDENT") {
+    return <StudentPage />;
+  }
+
   return (
     <div>
       <div className="container mx-auto max-w-7xl px-4 py-8 space-y-8">
+        {/* Header */}
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-primary/10">
@@ -170,6 +222,7 @@ export default function Home() {
           </Button>
         </div>
 
+        {/* Course list */}
         <div className="flex flex-wrap gap-5">
           {isPending ? (
             Array.from({ length: 6 }).map((_, i) => (
@@ -180,10 +233,8 @@ export default function Home() {
               <CourseCard
                 key={course._id}
                 {...course}
-                onDelete={() => {
-                  setGroupId(course._id);
-                  toggleModal("delete");
-                }}
+                onEdit={() => handleEditCourse(course)}
+                onDelete={() => handleDeleteCourse(course._id)}
               />
             ))
           ) : (
@@ -194,6 +245,7 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Create Modal */}
       <Modal
         formData={formData}
         isOpen={modals.create}
@@ -210,6 +262,22 @@ export default function Home() {
         isSubmitting={isCreating}
       />
 
+      {/* Update Modal */}
+      <UpdateModal
+        open={modals.edit}
+        onOpenChange={() => toggleModal("edit")}
+        formData={formData}
+        handleInputChange={handleInputChange}
+        handleMemberChange={(values) => handleSelectChange("members", values)}
+        handleSubmit={handleEdit}
+        users={users}
+        availableMembers={availableMembers}
+        handleSelectChange={handleSelectChange}
+        disabled={!isFormValid || isLoading}
+        isSubmitting={isLoading}
+      />
+
+      {/* Delete Modal */}
       <DeleteModal
         isOpen={modals.delete}
         onOpenChange={() => toggleModal("delete")}

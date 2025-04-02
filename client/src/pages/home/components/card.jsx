@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 import {
   BookOpen,
   Crown,
+  Edit,
   ImageMinus,
   ImageOff,
   Medal,
@@ -30,6 +31,7 @@ const CourseCard = ({
   achievement,
   imageUrl,
   onDelete,
+  onEdit,
 }) => {
   const navigate = useNavigate();
 
@@ -67,7 +69,7 @@ const CourseCard = ({
               />
             ) : (
               <div className="flex justify-center items-center w-full h-48">
-                <ImageOff size={80}/>
+                <ImageOff size={80} />
               </div>
             )}
 
@@ -90,11 +92,14 @@ const CourseCard = ({
               <p className="text-muted-foreground">{description}</p>
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex justify-between flex-wrap gap-2">
               <div className="flex items-center gap-1.5 text-sm bg-secondary/50 text-secondary-foreground px-2.5 py-1 rounded-full capitalize">
                 <Icon className="w-4 h-4" />
                 <span>{achievement.split("_").join(" ")}</span>
               </div>
+              <Button onClick={onEdit} className="py-1 px-3" variant="ghost">
+                <Edit />
+              </Button>
             </div>
           </div>
         </CardContent>

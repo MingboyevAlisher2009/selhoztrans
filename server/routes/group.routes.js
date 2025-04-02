@@ -13,6 +13,7 @@ import {
   getGroups,
   getTopics,
   handleAttendance,
+  updateGroup,
 } from "../controllers/group.controller.js";
 import AdminsMiddleware from "../middleware/admins.middleware.js";
 
@@ -39,6 +40,8 @@ router.get("/get-groups", AuthMiddleware, AdminsMiddleware, getGroups);
 router.get("/:id", AuthMiddleware, getGroup);
 
 router.get("/topics/:id", AuthMiddleware, getTopics);
+
+router.put("/:id", AuthMiddleware, AdminsMiddleware, updateGroup);
 
 router.delete("/:id", AuthMiddleware, AdminsMiddleware, deleteGroupORMember);
 

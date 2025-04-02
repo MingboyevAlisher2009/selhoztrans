@@ -267,7 +267,7 @@ const Group = () => {
         file = data.data.imageUrl;
       }
 
-      const { data } = await axiosIntense.post("/group/topic", {
+      await axiosIntense.post("/group/topic", {
         ...values,
         groupId: id,
         file,
@@ -647,11 +647,11 @@ const Group = () => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <UserPlus className="h-5 w-5" />
-              Add Members
+              A'zo qo'shish
             </DialogTitle>
             <DialogDescription className="text-muted-foreground">
-              Select members to add to the group. You can add multiple members
-              at once.
+              Guruhga qo'shish uchun a'zolarni tanlang. Siz bir nechta a'zolarni
+              qo'shishingiz mumkin birdaniga.
             </DialogDescription>
           </DialogHeader>
           <ScrollArea className="max-h-[60vh]">
@@ -669,8 +669,8 @@ const Group = () => {
               />
               {members.length > 0 && (
                 <p className="text-sm text-muted-foreground">
-                  {members.length} member{members.length !== 1 ? "s" : ""}{" "}
-                  selected
+                  {members.length} a'zolar{members.length !== 1 ? "s" : ""}{" "}
+                  tanlangan
                 </p>
               )}
             </div>
@@ -683,7 +683,7 @@ const Group = () => {
               className="w-full sm:w-auto"
               disabled={isAddingMembers}
             >
-              Cancel
+              Yopish
             </Button>
             <Button
               onClick={addMember}
@@ -693,11 +693,12 @@ const Group = () => {
               {isAddingMembers ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Adding...
+                  Yuklanmoqda...
                 </>
               ) : (
                 <>
-                  Add {members.length > 0 ? `(${members.length})` : "Members"}
+                  Qo'shish{" "}
+                  {members.length > 0 ? `(${members.length})` : "A'zolar"}
                 </>
               )}
             </Button>

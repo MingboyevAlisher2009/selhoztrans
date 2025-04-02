@@ -129,7 +129,7 @@ export const userInfo = async (req, res, next) => {
         ) || {
           totalSessions: Math.ceil(
             (now - new Date(group.createdAt)) / (1000 * 60 * 60 * 24)
-          ), // Calculate if not found in stats
+          ),
           attendedSessions: 0,
           notAttendedSessions: 0,
           pendingSessions: 0,
