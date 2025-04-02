@@ -59,11 +59,11 @@ export function GroupTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[100px]">Student</TableHead>
-            <TableHead>Details</TableHead>
+            <TableHead className="w-[100px]">O'quvchilar</TableHead>
+            <TableHead>Tafsilotlar</TableHead>
             <TableHead>Role</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Attendance</TableHead>
+            <TableHead>Holati</TableHead>
+            <TableHead>Davomat</TableHead>
             <TableHead className="w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>

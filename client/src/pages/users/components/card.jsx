@@ -72,7 +72,7 @@ const StudentCard = ({
               <div className="space-y-3">
                 <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                   <Book className="w-4 h-4" />
-                  <span>Groups</span>
+                  <span>Gruhlar</span>
                 </div>
                 {groups.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
@@ -89,7 +89,7 @@ const StudentCard = ({
                 ) : (
                   <div className="flex items-center gap-2 text-smd bg-destructive/10 text-destructive rounded-md p-2">
                     <X className="w-4 h-4" />
-                    <span>No groups assigned</span>
+                    <span>Hech qanday guruh tayinlanmagan</span>
                   </div>
                 )}
               </div>
@@ -100,7 +100,7 @@ const StudentCard = ({
                 <div className="flex justify-between items-center text-sm">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Users className="w-4 h-4" />
-                    <span>Attendance</span>
+                    <span>Davomat</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="font-medium">
@@ -128,7 +128,7 @@ const StudentCard = ({
             size="lg"
           >
             <Trash className="w-4 h-4" />
-            Delete
+            O'chirish
           </Button>
         </CardFooter>
       </Card>

@@ -357,7 +357,7 @@ const Group = () => {
               animate={{ opacity: 1, x: 0 }}
               className="text-2xl font-bold tracking-tight"
             >
-              Topics
+              Mavzular
             </motion.h2>
             {(userInfo && userInfo.role === "ADMIN") ||
               (userInfo && userInfo.role === "SUPER_ADMIN" && (
@@ -373,7 +373,7 @@ const Group = () => {
                       className="group"
                     >
                       <Plus className="w-4 h-4 mr-1 transition-transform duration-200 group-hover:rotate-90" />
-                      Add Topic
+                      Mavzu qo'shish
                     </Button>
                   </motion.div>
                   <motion.div
@@ -386,7 +386,7 @@ const Group = () => {
                       size="sm"
                       className="group"
                     >
-                      Students
+                      O'quvchilar
                     </Button>
                   </motion.div>
                 </div>
@@ -425,7 +425,7 @@ const Group = () => {
                             }}
                           >
                             <Trash className="mr-2 h-4 w-4" />
-                            Delete topic
+                            Mavzuni o'chirish
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -499,7 +499,7 @@ const Group = () => {
           className="w-full sm:max-w-5xl overflow-y-auto"
         >
           <SheetHeader className={"flex gap-5 flex-wrap justify-between"}>
-            <SheetTitle>Students</SheetTitle>
+            <SheetTitle>O'quvchilar</SheetTitle>
             <div className="flex flex-wrap items-center justify-between">
               <Input
                 placeholder="Search..."
@@ -524,7 +524,7 @@ const Group = () => {
                         {selectedDate ? (
                           format(selectedDate, "PPP")
                         ) : (
-                          <span>Pick a date</span>
+                          <span>Sana tanlang</span>
                         )}
                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                       </Button>
@@ -550,7 +550,7 @@ const Group = () => {
                     className="group"
                   >
                     <Plus className="w-4 h-4 mr-2 transition-transform duration-200 group-hover:rotate-90" />
-                    Add Member
+                    A'zo qushish
                   </Button>
                 </motion.div>
               </div>
@@ -659,7 +659,9 @@ const Group = () => {
               <MultiSelect
                 onValueChange={setMembers}
                 users={users}
-                defaultValue={data && data.data.members?.map((user) => user._id)}
+                defaultValue={
+                  data && data.data.members?.map((user) => user._id)
+                }
                 options={availableMembers}
                 placeholder="Search and select members..."
                 animation={0.3}

@@ -121,7 +121,7 @@ export default function Users() {
           <div className="w-full flex items-center justify-between">
             <div className="space-y-1">
               <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
-                Students
+                O'quvchilar
               </h1>
             </div>
             <div className="flex items-center gap-2">
@@ -131,7 +131,7 @@ export default function Users() {
                 className="gap-2"
               >
                 <Plus className="w-4 h-4" />
-                New student
+                Yangi o'quvchi
               </Button>
             </div>
           </div>
@@ -160,7 +160,7 @@ export default function Users() {
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle className="text-2xl font-semibold">
-              Create New User
+              Foydalanauvchi
             </DialogTitle>
           </DialogHeader>
           <Form {...form}>
@@ -170,7 +170,7 @@ export default function Users() {
                 name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <Label>Username</Label>
+                    <Label>Foydalanuvchi nomi</Label>
                     <FormControl>
                       <Input placeholder="Jon Doe" {...field} />
                     </FormControl>
@@ -207,7 +207,7 @@ export default function Users() {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="ADMIN">Admin</SelectItem>
-                            <SelectItem value="STUDENT">Student</SelectItem>
+                            <SelectItem value="STUDENT">O'quvchi</SelectItem>
                           </SelectContent>
                         </Select>
                       </FormControl>
@@ -221,7 +221,7 @@ export default function Users() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <Label>Password</Label>
+                    <Label>Parol</Label>
                     <FormControl>
                       <Input placeholder="******" type="password" {...field} />
                     </FormControl>
@@ -231,7 +231,7 @@ export default function Users() {
               />
               <div className="flex justify-end">
                 <Button disabled={isLoading} type="submit">
-                  Add
+                  Qo'shish
                 </Button>
               </div>
             </form>

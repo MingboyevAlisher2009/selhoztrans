@@ -88,16 +88,14 @@ const Modal = ({
     <Dialog open={isOpen} onOpenChange={toggleModal}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-semibold">
-            Create New Group
-          </DialogTitle>
+          <DialogTitle className="text-2xl font-semibold">Gruh</DialogTitle>
         </DialogHeader>
         <ScrollArea className="max-h-[85vh] px-1.5">
           <form onSubmit={handleSubmit} className="space-y-6 px-1">
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="image" className="text-sm font-medium">
-                  Group Image
+                  Gruh rasmi
                 </Label>
                 <div
                   className={`relative group cursor-pointer ${
@@ -152,7 +150,7 @@ const Modal = ({
 
               <div className="space-y-2">
                 <Label htmlFor="title" className="text-sm font-medium">
-                  Group Name
+                  Gruh nomi
                 </Label>
                 <Input
                   id="title"
@@ -165,7 +163,7 @@ const Modal = ({
 
               <div className="space-y-2">
                 <Label htmlFor="level" className="text-sm font-medium">
-                  Level
+                  Daraja
                 </Label>
                 <Select
                   value={formData.level}
@@ -176,10 +174,10 @@ const Modal = ({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectLabel>Select level</SelectLabel>
-                      <SelectItem value="beginner">Beginner</SelectItem>
-                      <SelectItem value="intermediate">Intermediate</SelectItem>
-                      <SelectItem value="advanced">Advanced</SelectItem>
+                      <SelectLabel>Darajani tanlang</SelectLabel>
+                      <SelectItem value="beginner">Boshlovchi</SelectItem>
+                      <SelectItem value="intermediate">O'rta</SelectItem>
+                      <SelectItem value="advanced">Murakkab</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
@@ -187,7 +185,7 @@ const Modal = ({
 
               <div className="space-y-2">
                 <Label htmlFor="achievement" className="text-sm font-medium">
-                  Achievement
+                  Muvaffaqiyat
                 </Label>
                 <Select
                   value={formData.achievement}
@@ -200,10 +198,10 @@ const Modal = ({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectLabel>Select achievement</SelectLabel>
-                      <SelectItem value="certificate">Certificate</SelectItem>
-                      <SelectItem value="badge">Badge</SelectItem>
-                      <SelectItem value="points">Points</SelectItem>
+                      <SelectLabel>Tanlang muvaffaqiyat</SelectLabel>
+                      <SelectItem value="certificate">Sertifikat</SelectItem>
+                      <SelectItem value="badge">Belgi</SelectItem>
+                      <SelectItem value="points">Ballar</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
@@ -211,7 +209,7 @@ const Modal = ({
 
               <div className="space-y-2">
                 <Label htmlFor="description" className="text-sm font-medium">
-                  Description
+                  Tavsif
                 </Label>
                 <Textarea
                   id="description"
@@ -223,7 +221,7 @@ const Modal = ({
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-medium">Members</Label>
+                <Label className="text-sm font-medium">A'zo</Label>
 
                 <MultiSelect
                   onValueChange={handleMemberChange}
@@ -244,7 +242,7 @@ const Modal = ({
                 onClick={toggleModal}
                 className="w-full sm:w-auto"
               >
-                Cancel
+                Yopish
               </Button>
               <Button
                 disabled={disabled}
@@ -254,10 +252,10 @@ const Modal = ({
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating...
+                    Yaratilmoqda...
                   </>
                 ) : (
-                  "Create Group"
+                  "Yangi guruh"
                 )}
               </Button>
             </DialogFooter>

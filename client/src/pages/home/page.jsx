@@ -158,7 +158,7 @@ export default function Home() {
             <div className="p-2 rounded-lg bg-primary/10">
               <Group className="w-6 h-6 text-primary" />
             </div>
-            <h1 className="text-3xl font-bold tracking-tight">Groups</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Gruhlar</h1>
           </div>
           <Button
             onClick={() => toggleModal("create")}
@@ -166,7 +166,7 @@ export default function Home() {
             className="gap-2 transition-all hover:gap-3"
           >
             <Plus className="w-4 h-4" />
-            New Group
+            Yangi Guruh
           </Button>
         </div>
 
@@ -188,7 +188,7 @@ export default function Home() {
             ))
           ) : (
             <div className="col-span-full text-center py-10 text-muted-foreground">
-              No groups found. Create your first group to get started!
+              Guruhlar topilmadi. Yangi guruh yarating!
             </div>
           )}
         </div>

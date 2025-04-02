@@ -7,6 +7,7 @@ import {
   removeProfileImage,
   removeUser,
   signUp,
+  updateProfile,
   userInfo,
 } from "../controllers/auth.controller.js";
 import multer from "multer";
@@ -16,6 +17,10 @@ import AdminsMiddleware from "../middleware/admins.middleware.js";
 
 const router = Router();
 const upload = multer({ dest: "uploads/profiles" });
+
+router.get("/user-info", AuthMiddleware, userInfo);
+
+router.get("/get-users", AuthMiddleware, AdminsMiddleware, getUsers);
 
 router.post("/login", login);
 
@@ -30,9 +35,7 @@ router.post(
   addProfileImage
 );
 
-router.get("/user-info", AuthMiddleware, userInfo);
-
-router.get("/get-users", AuthMiddleware, AdminsMiddleware, getUsers);
+router.put("/", AuthMiddleware, updateProfile)
 
 router.delete("/:id", AuthMiddleware, SuperAdminMiddleware, removeUser);
 

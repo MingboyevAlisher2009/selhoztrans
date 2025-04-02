@@ -39,22 +39,22 @@ const StudentPage = () => {
 
   const stats = [
     {
-      title: "Total Groups",
+      title: "Gruhlar soni",
       value: userInfo.attendance?.totalGroups || 0,
       icon: Users,
     },
     {
-      title: "Total Sessions",
+      title: "Seanslar soni",
       value: userInfo.attendance?.totalSessions || 0,
       icon: Calendar,
     },
     {
-      title: "Attended",
+      title: "Davomat",
       value: userInfo.attendance?.attendedSessions || 0,
       icon: CheckCircle2,
     },
     {
-      title: "Missed",
+      title: "O'tkazib yuborilgan",
       value: userInfo.attendance?.notAttendedSessions || 0,
       icon: XCircle,
     },
@@ -123,7 +123,7 @@ const StudentPage = () => {
       {/* Profile Header */}
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-3xl" />
-        <div className="=]['/=]}+-{o0.,} flex flex-col lg:flex-row items-center gap-8 p-8 rounded-3xl bg-card">
+        <div className="flex flex-col lg:flex-row items-center gap-8 p-8 rounded-3xl bg-card">
           <div
             className="relative group"
             onMouseEnter={() => setIsHovering(true)}
@@ -189,7 +189,7 @@ const StudentPage = () => {
                 {userInfo.role.toLowerCase()}
               </Badge>
               <Badge variant="outline" className="text-sm">
-                Joined {format(new Date(userInfo.createdAt), "MMM dd yyyy")}
+                Qo'shilgan {format(new Date(userInfo.createdAt), "MMM dd yyyy")}
               </Badge>
             </div>
 
@@ -199,7 +199,7 @@ const StudentPage = () => {
                 className="w-48"
               />
               <span className="text-sm text-muted-foreground">
-                {userInfo.attendance?.attendanceRate || 0}% Attendance
+                {userInfo.attendance?.attendanceRate || 0}% Davomat
               </span>
             </div>
           </div>
@@ -241,13 +241,13 @@ const StudentPage = () => {
       {/* Groups Section */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Your Groups</h2>
+          <h2 className="text-2xl font-bold">Sizni guruhlaringiz</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {userInfo.groups?.length === 0 ? (
             <div className="col-span-full text-center py-10 text-muted-foreground">
-              You haven't joined any groups yet.
+              Siz guruhlarga qo'shilmagansiz.
             </div>
           ) : (
             userInfo.groups?.map((group, index) => (
@@ -292,7 +292,7 @@ const StudentPage = () => {
                       <div className="flex items-center gap-2">
                         <GraduationCap className="w-4 h-4 text-primary" />
                         <span className="text-sm">
-                          {group.attendance.totalSessions} Sessions
+                          {group.attendance.totalSessions} Seanslar
                         </span>
                       </div>
                       <Badge
@@ -302,7 +302,7 @@ const StudentPage = () => {
                             : "secondary"
                         }
                       >
-                        {group.attendance.attendanceRate.toFixed(2)}% Attendance
+                        {group.attendance.attendanceRate.toFixed(2)}% Davomat
                       </Badge>
                     </div>
                   </CardContent>
@@ -316,7 +316,7 @@ const StudentPage = () => {
       {/* Today's Activity */}
       {userInfo.attendance?.today && userInfo.attendance.today.length > 0 && (
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold">Today's Activity</h2>
+          <h2 className="text-2xl font-bold">Bugungi faoliyat</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {userInfo.attendance.today.map((activity) => (
               <Card key={activity.groupId}>

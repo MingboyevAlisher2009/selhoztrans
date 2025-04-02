@@ -38,81 +38,6 @@ const successResponse = (res, status, data) => {
   });
 };
 
-export const login = async (req, res, next) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return errorResponse(res, 400, errors.array()[0].msg);
-    }
-
-    const { email, password } = req.body;
-
-    const user = await User.findOne({ email });
-    if (!user) {
-      return errorResponse(res, 404, "User not found");
-    }
-
-    const isPasswordValid = await compare(password, user.password);
-    if (!isPasswordValid) {
-      return errorResponse(res, 401, "Invalid credentials");
-    }
-
-    generateToken(res, user._id);
-
-    return successResponse(res, 200, { message: "Login successful" });
-  } catch (error) {
-    console.error("Login error:", error);
-    next(error);
-  }
-};
-
-export const signUp = async (req, res, next) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return errorResponse(res, 400, errors.array()[0].msg);
-    }
-
-    const { email, password } = req.body;
-
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return errorResponse(res, 409, "User already exists");
-    }
-
-    const hashedPassword = await hash(password, 10);
-    await User.create({
-      ...req.body,
-      password: hashedPassword,
-    });
-
-    return successResponse(res, 201, {
-      message: "Registration successful",
-    });
-  } catch (error) {
-    console.error("Signup error:", error);
-    next(error);
-  }
-};
-
-export const logout = async (req, res, next) => {
-  try {
-    res.cookie("jwt", "", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 0,
-    });
-
-    return successResponse(res, 200, {
-      message: "Logged out successfully",
-    });
-  } catch (error) {
-    console.error("Logout error:", error);
-    next(error);
-  }
-};
-
 export const userInfo = async (req, res, next) => {
   try {
     const now = new Date();
@@ -133,7 +58,6 @@ export const userInfo = async (req, res, next) => {
       startOfMonth.setDate(1);
       startOfMonth.setHours(0, 0, 0, 0);
 
-      // Fixed aggregation pipeline
       const attendanceStats = await Attending.aggregate([
         {
           $match: {
@@ -153,7 +77,7 @@ export const userInfo = async (req, res, next) => {
           },
         },
         {
-          $unwind: "$groupInfo", // Unwind groupInfo array to get single document
+          $unwind: "$groupInfo",
         },
         {
           $match: {
@@ -522,6 +446,81 @@ export const getUsers = async (req, res, next) => {
   }
 };
 
+export const login = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return errorResponse(res, 400, errors.array()[0].msg);
+    }
+
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return errorResponse(res, 404, "User not found");
+    }
+
+    const isPasswordValid = await compare(password, user.password);
+    if (!isPasswordValid) {
+      return errorResponse(res, 401, "Invalid credentials");
+    }
+
+    generateToken(res, user._id);
+
+    return successResponse(res, 200, { message: "Login successful" });
+  } catch (error) {
+    console.error("Login error:", error);
+    next(error);
+  }
+};
+
+export const signUp = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return errorResponse(res, 400, errors.array()[0].msg);
+    }
+
+    const { email, password } = req.body;
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return errorResponse(res, 409, "User already exists");
+    }
+
+    const hashedPassword = await hash(password, 10);
+    await User.create({
+      ...req.body,
+      password: hashedPassword,
+    });
+
+    return successResponse(res, 201, {
+      message: "Registration successful",
+    });
+  } catch (error) {
+    console.error("Signup error:", error);
+    next(error);
+  }
+};
+
+export const logout = async (req, res, next) => {
+  try {
+    res.cookie("jwt", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 0,
+    });
+
+    return successResponse(res, 200, {
+      message: "Logged out successfully",
+    });
+  } catch (error) {
+    console.error("Logout error:", error);
+    next(error);
+  }
+};
+
 export const addProfileImage = async (req, res, next) => {
   try {
     if (!req.file) {
@@ -544,12 +543,16 @@ export const addProfileImage = async (req, res, next) => {
     const user = await User.findByIdAndUpdate(
       req.userId,
       { imageUrl: fileName },
-      { new: true, runValidators: true }
+      { runValidators: true }
     ).select("-password");
 
     if (!user) {
       unlinkSync(fileName);
       return errorResponse(res, 404, "User not found");
+    }
+
+    if (user.imageUrl) {
+      unlinkSync(user.imageUrl);
     }
 
     return successResponse(res, 200, {
@@ -560,6 +563,22 @@ export const addProfileImage = async (req, res, next) => {
     console.error("Add profile image error:", error);
     if (req.file && existsSync(req.file.path)) {
       unlinkSync(req.file.path);
+    }
+    next(error);
+  }
+};
+
+export const updateProfile = async (req, res, next) => {
+  const { userId } = req;
+  try {
+    const user = await User.findByIdAndUpdate(userId, req.body, { new: true });
+    console.log(user);
+
+    successResponse(res, 201, "Profile information updated succesfullhy");
+  } catch (error) {
+    console.error("Profile error:", error);
+    if (req.body.imageUrl && existsSync(req.body.imageUrl)) {
+      unlinkSync(req.body.imageUrl);
     }
     next(error);
   }

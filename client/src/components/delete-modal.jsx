@@ -21,10 +21,13 @@ const DeleteModal = ({ isOpen, onOpenChange, onConfirm, isPending }) => {
             <AlertTriangle className="h-20 w-20" />
           </div>
           <div className="text-center">
-            <DialogTitle className="text-xl">Confirm Deletion</DialogTitle>
+            <DialogTitle className="text-xl">
+              Oʻchirishni tasdiqlang
+            </DialogTitle>
             <DialogDescription className="mt-3 text-[15px] leading-normal">
-              This action cannot be undone. This will permanently delete the
-              selected item and remove all associated data from our servers.
+              Bu amalni ortga qaytarib bo‘lmaydi. Bu tanlangan elementni
+              butunlay oʻchirib tashlaydi va serverlarimizdan bogʻlangan barcha
+              maʼlumotlarni oʻchirib tashlaydi.
             </DialogDescription>
           </div>
         </DialogHeader>
@@ -35,7 +38,7 @@ const DeleteModal = ({ isOpen, onOpenChange, onConfirm, isPending }) => {
               variant="outline"
               className="w-full sm:w-auto"
             >
-              Cancel
+              Yopish
             </Button>
           </DialogClose>
           <Button
@@ -46,7 +49,7 @@ const DeleteModal = ({ isOpen, onOpenChange, onConfirm, isPending }) => {
             onClick={onConfirm}
           >
             <Trash2 className="h-4 w-4" />
-            Delete
+            O'chirish
           </Button>
         </DialogFooter>
       </DialogContent>
