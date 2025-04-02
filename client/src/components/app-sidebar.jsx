@@ -73,7 +73,7 @@ export function AppSidebar({ children }) {
   const [isDragging, setIsDragging] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [form, setForm] = useState({
-    imageUrl: userInfo.imageUrl || "",
+    imageUrl: userInfo && userInfo.imageUrl || "",
     email: userInfo?.email || "",
     username: userInfo?.username || "",
   });
