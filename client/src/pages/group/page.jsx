@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import {
   ArrowLeft,
   CalendarIcon,
+  Edit2,
   File,
   ImageOff,
   ImagePlus,
@@ -85,6 +86,7 @@ const Group = () => {
   const [isAddTopic, setisAddTopic] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [isUpdadeModalOpen, setIsUpdadeModalOpen] = useState(false);
   const [members, setMembers] = useState([]);
   const [userId, setUserId] = useState(null);
   const [topicId, setTopicId] = useState();
@@ -109,8 +111,8 @@ const Group = () => {
   const formSchema = z.object({
     title: z.string().min(2).max(50),
     description: z.string().min(5),
-    link: z.string().url().optional(),
-    file: z.any(),
+    link: z.string().optional(),
+    file: z.any().optional(),
   });
 
   const form = useForm({
@@ -280,6 +282,24 @@ const Group = () => {
     }
   };
 
+  const handleEdit = async (values) => {
+    try {
+      await axiosIntense.put(`/group/topic/${topicId}`, values);
+      setIsUpdadeModalOpen(false);
+      getTopics();
+      toast("Topic added succesfullt");
+      form.reset();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      document.body.style.removeProperty("pointer-events");
+    };
+  }, [isUpdadeModalOpen, setIsUpdadeModalOpen]);
+
   if (isPending) {
     return <GroupSkeleton />;
   }
@@ -399,12 +419,10 @@ const Group = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
+                  key={i}
                   className="group"
                 >
-                  <Card
-                    key={i}
-                    className="relative overflow-hidden border-muted/30 transition-all duration-300 hover:shadow-lg hover:border-primary/20 hover:-translate-y-1"
-                  >
+                  <Card className="relative overflow-hidden border-muted/30 transition-all duration-300 hover:shadow-lg hover:border-primary/20 hover:-translate-y-1">
                     <div className="absolute right-2 top-2">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -417,6 +435,19 @@ const Group = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            className="text-yellow-500 focus:text-yellow-600"
+                            onClick={() => {
+                              setTopicId(topic._id);
+                              setIsUpdadeModalOpen(true);
+
+                              form.setValue("title", topic.title);
+                              form.setValue("description", topic.description);
+                            }}
+                          >
+                            <Edit2 className="mr-2 h-4 w-4" />
+                            Mavzuni tahrirlash
+                          </DropdownMenuItem>
                           <DropdownMenuItem
                             className="text-destructive focus:text-destructive"
                             onClick={() => {
@@ -570,6 +601,55 @@ const Group = () => {
           </div>
         </SheetContent>
       </Sheet>
+
+      <Dialog
+        open={isUpdadeModalOpen}
+        onOpenChange={() => {
+          setIsUpdadeModalOpen(false);
+          form.reset();
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Topic</DialogTitle>
+          </DialogHeader>
+          {/* todo: fix later */}
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(handleEdit)}
+              className="space-y-8"
+            >
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <Label>Title</Label>
+                    <FormControl>
+                      <Input placeholder="Title" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <Label>Description</Label>
+                    <FormControl>
+                      <Textarea placeholder="Description" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit">Submit</Button>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={isAddTopic} onOpenChange={toggleAddModal}>
         <DialogContent>

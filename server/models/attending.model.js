@@ -16,8 +16,8 @@ const attendingSchema = new Schema(
         },
         isAttending: {
           type: String,
-          enum: ["panding", "attending", "not-attending"],
-          default: "panding",
+          enum: ["pending", "attending", "not-attending"],
+          default: "pending",
           required: true,
         },
         createdAt: {

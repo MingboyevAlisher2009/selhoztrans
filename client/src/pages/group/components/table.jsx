@@ -36,7 +36,7 @@ export function GroupTable({
   const disabled = isBefore(date, today);
 
   const handleAttendence = (id, attendance, attendanceId) => {
-    const status = attendance ? "attending" : "not-attending";
+    const status = attendance ? "attending" : "pending";
     const updateStatus = attendanceId
       ? { groupId: data.groupId, userId: id, status, attendanceId }
       : {
@@ -48,7 +48,7 @@ export function GroupTable({
                 ? status
                 : data.isAttending
                 ? data.isAttending
-                : "not-attending",
+                : "pending",
           })),
         };
     handleCheck(updateStatus);

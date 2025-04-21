@@ -509,6 +509,27 @@ export const updateGroup = async (req, res, next) => {
   }
 };
 
+export const updateTopic = async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    if (!id) {
+      return errorResponse(res, 400, "Id not found.");
+    }
+
+    const updatedTopic = await Topics.findByIdAndUpdate(id, req.body, {
+      new: true,
+    });
+
+    if(!updatedTopic) {
+      return errorResponse(res, 404, "Topic not found")
+    }
+
+    return successResponse(res, 200, updatedTopic)
+  } catch (error) {
+    next("Update topic error:", error);
+  }
+};
+
 export const deleteGroupORMember = async (req, res, next) => {
   try {
     const { id } = req.params;

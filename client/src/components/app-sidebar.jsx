@@ -73,7 +73,7 @@ export function AppSidebar({ children }) {
   const [isDragging, setIsDragging] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [form, setForm] = useState({
-    imageUrl: userInfo && userInfo.imageUrl || "",
+    imageUrl: (userInfo && userInfo.imageUrl) || "",
     email: userInfo?.email || "",
     username: userInfo?.username || "",
   });
@@ -169,15 +169,15 @@ export function AppSidebar({ children }) {
     try {
       const formData = new FormData();
       formData.append("profile-image", form.imageUrl);
+      let image;
 
-      const image = await axiosIntense.post(
-        "/auth/add-profile-image",
-        formData
-      );
+      if (form.imageUrl) {
+        image = await axiosIntense.post("/auth/add-profile-image", formData);
+      }
 
       await axiosIntense.put("/auth", {
         ...form,
-        imageUrl: image.data.imageUrl,
+        imageUrl: image ? image.data.imageUrl : null,
       });
 
       getUserInfo();
@@ -409,7 +409,7 @@ export function AppSidebar({ children }) {
             </DialogClose>
             <Button
               type="submit"
-              disabled={!form.username || !form.email || !form.imageUrl}
+              disabled={!form.username || !form.email}
               onClick={handleSubmit}
             >
               Saqlash
