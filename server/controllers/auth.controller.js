@@ -5,6 +5,7 @@ import { existsSync, renameSync, unlinkSync } from "fs";
 import { body, validationResult } from "express-validator";
 import Group from "../models/group.model.js";
 import Attending from "../models/attending.model.js";
+import axios from "axios";
 
 export const loginValidation = [
   body("email").isEmail().withMessage("Please enter a valid email"),
@@ -482,18 +483,24 @@ export const signUp = async (req, res, next) => {
     }
 
     const { email, password } = req.body;
+    const hashedPassword = await hash(password, 10);
+
+    await axios.post(process.env.INTEGRATION_URL, {
+      email,
+      password: hashedPassword,
+      profileSetup: true,
+      color: Math.floor(Math.random() * 3),
+    });
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return errorResponse(res, 409, "User already exists");
     }
 
-    const hashedPassword = await hash(password, 10);
     await User.create({
       ...req.body,
       password: hashedPassword,
     });
-
     return successResponse(res, 201, {
       message: "Registration successful",
     });
@@ -594,7 +601,11 @@ export const removeUser = async (req, res, next) => {
     await User.findByIdAndDelete(id);
 
     successResponse(res, 200, "User deleted succesfully");
-  } catch (error) {}
+  } catch (error) {
+    console.log("Delete user:", error);
+
+    next(error);
+  }
 };
 
 export const removeProfileImage = async (req, res, next) => {
