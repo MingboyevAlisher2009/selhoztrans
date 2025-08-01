@@ -29,7 +29,7 @@ import { useMutation } from "@tanstack/react-query";
 import axiosIntense from "@/http/axios";
 import GroupSkeleton from "@/components/skeletons/group";
 import { Badge } from "@/components/ui/badge";
-import { BASE_URL } from "@/http/api";
+import { BASE_URL, SERVER_URL } from "@/http/api";
 import {
   Popover,
   PopoverContent,
@@ -64,7 +64,6 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -736,7 +735,7 @@ const Group = () => {
               <>
                 <div ref={canvasRef}>
                   <QRCodeCanvas
-                    value={`${BASE_URL}/certificate/${certificate._id}`}
+                    value={`${SERVER_URL}/certificate/${certificate._id}`}
                     size={250}
                     bgColor="#18181b"
                     fgColor="white"
