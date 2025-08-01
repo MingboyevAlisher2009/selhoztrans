@@ -320,7 +320,7 @@ const Group = () => {
         studentId: userId,
       });
       setCertificate(data.data.certificate);
-      setStudent(initialValue)
+      setStudent(initialValue);
     } catch (error) {
       toast.error(
         error.response.data.message ||
@@ -736,11 +736,10 @@ const Group = () => {
               <>
                 <div ref={canvasRef}>
                   <QRCodeCanvas
-                    value={`${BASE_URL}certificate/${certificate._id}`}
+                    value={`${BASE_URL}/certificate/${certificate._id}`}
                     size={250}
                     bgColor="#18181b"
                     fgColor="white"
-                    includeMargin={true}
                   />
                 </div>
                 <div className="space-x-2 flex items-center">
