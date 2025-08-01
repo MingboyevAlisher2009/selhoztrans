@@ -26,6 +26,21 @@ export const signupValidation = [
     .withMessage("Password must be at least 6 characters"),
 ];
 
+// async function safePostWithRetry(url, data, retries = 3, delay = 1000) {
+//   for (let i = 0; i < retries; i++) {
+//     try {
+//       return await axios.post(url, data);
+//     } catch (error) {
+//       if (error.response?.status === 429 && i < retries - 1) {
+//         await new Promise((resolve) => setTimeout(resolve, delay));
+//         delay *= 2;
+//       } else {
+//         throw error;
+//       }
+//     }
+//   }
+// }
+
 const errorResponse = (res, status, message) => {
   return res.status(status).json({
     status: "error",
@@ -521,12 +536,12 @@ export const signUp = async (req, res, next) => {
     const { email, password } = req.body;
     const hashedPassword = await hash(password, 10);
 
-    await axios.post(process.env.INTEGRATION_URL, {
-      email,
-      password: hashedPassword,
-      profileSetup: true,
-      color: Math.floor(Math.random() * 3),
-    });
+    // await safePostWithRetry(process.env.INTEGRATION_URL, {
+    //   email,
+    //   password: hashedPassword,
+    //   profileSetup: true,
+    //   color: Math.floor(Math.random() * 3),
+    // });
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
