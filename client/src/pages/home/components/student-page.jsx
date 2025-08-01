@@ -19,7 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -31,6 +31,7 @@ import { useNavigate } from "react-router-dom";
 const StudentPage = () => {
   const { userInfo, getUserInfo } = useAuth();
   const queryClient = useQueryClient();
+  const [certificates, setCertificates] = useState(null);
 
   const fileInputRef = useRef(null);
   const [isHovering, setIsHovering] = useState(false);
@@ -107,6 +108,20 @@ const StudentPage = () => {
       window.location.pathname = "/auth";
     },
   });
+
+  const getCertificates = async () => {
+    try {
+      const { data } = await axiosIntense.get("/certificate");
+      console.log(data);
+      setCertificates(data.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getCertificates();
+  }, []);
 
   const handleImageUpload = (e) => {
     if (isUploading) return;
@@ -312,6 +327,57 @@ const StudentPage = () => {
           )}
         </div>
       </div>
+
+      {/* Certificates Section */}
+      {certificates && certificates.length > 0 && (
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold">📜 Sertifikatlaringiz</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {certificates.map((certificate) => (
+              <Card key={certificate._id}>
+                <CardHeader>
+                  <CardTitle className="text-lg">
+                    {certificate.student.username}
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Yaratilgan:{" "}
+                    {format(new Date(certificate.createdAt), "PPP p")}
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div className="text-sm">
+                    <span className="font-semibold">Muallif:</span>{" "}
+                    {certificate.author.username}
+                  </div>
+                  <div className="text-sm">
+                    <span className="font-semibold">Email:</span>{" "}
+                    {certificate.student.email}
+                  </div>
+                  <div className="text-sm">
+                    <span className="font-semibold">Roli:</span>{" "}
+                    <Badge variant="secondary">
+                      {certificate.student.role}
+                    </Badge>
+                  </div>
+                  <div className="pt-4">
+                    <Button
+                      variant="default"
+                      onClick={() =>
+                        window.open(
+                          `${BASE_URL}${certificate.certificate}`,
+                          "_blank"
+                        )
+                      }
+                    >
+                      📄 Yuklab olish
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Today's Activity */}
       {userInfo.attendance?.today && userInfo.attendance.today.length > 0 && (

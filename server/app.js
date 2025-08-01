@@ -4,6 +4,7 @@ import cors from "cors";
 import errorMiddleware from "./middleware/error.middleware.js";
 import authRoutes from "./routes/auth.routes.js";
 import groupRoutes from "./routes/group.routes.js";
+import certificateRoutes from "./routes/certificate.routes.js";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import path from "path";
@@ -26,6 +27,7 @@ app.use("/uploads", express.static("uploads"));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/group", groupRoutes);
+app.use("/api/certificate", certificateRoutes)
 
 app.use(errorMiddleware);
 

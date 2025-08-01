@@ -12,6 +12,7 @@ import User from "../models/user.model.js";
 import mongoose from "mongoose";
 import Topics from "../models/topics.model.js";
 import path from "path";
+import Certificate from "../models/certificates.model.js";
 
 const errorResponse = (res, status, message) => {
   return res.status(status).json({
@@ -381,9 +382,9 @@ export const getGroup = async (req, res, next) => {
       queryDate = new Date();
     }
 
-    if (queryDate > new Date()) {
-      return errorResponse(res, 400, "Date cannot be in the future");
-    }
+    // if (queryDate > new Date()) {
+    //   return errorResponse(res, 400, "Date cannot be in the future");
+    // }
 
     const group = await Group.findById(id)
       .populate({
@@ -415,13 +416,21 @@ export const getGroup = async (req, res, next) => {
       })
       .lean();
 
+    const certificate = await Certificate.find();
+
     const membersWithAttendance = group.members.map((member) => {
       const memberAttendance = attendance?.members.find(
         (m) => m.user._id.toString() === member._id.toString()
       );
 
+      const memberWithCertificates = certificate.filter(
+        (e) => e.student.toString() === member._id.toString()
+      );
+      console.log(memberWithCertificates);
+
       return {
         ...member,
+        certificates: memberWithCertificates,
         attendance: {
           status: memberAttendance?.isAttending || "pending",
           recordId: attendance?._id || null,
@@ -520,11 +529,11 @@ export const updateTopic = async (req, res, next) => {
       new: true,
     });
 
-    if(!updatedTopic) {
-      return errorResponse(res, 404, "Topic not found")
+    if (!updatedTopic) {
+      return errorResponse(res, 404, "Topic not found");
     }
 
-    return successResponse(res, 200, updatedTopic)
+    return successResponse(res, 200, updatedTopic);
   } catch (error) {
     next("Update topic error:", error);
   }

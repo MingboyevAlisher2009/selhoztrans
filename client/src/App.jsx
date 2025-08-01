@@ -8,6 +8,7 @@ import Group from "./pages/group/page";
 import { AppSidebar } from "./components/app-sidebar";
 import useAuth from "./store/use-auth";
 import { Loader } from "lucide-react";
+import Certificate from "./pages/certificate/page";
 
 const App = () => {
   const { getUserInfo, isLoading, userInfo } = useAuth();
@@ -18,14 +19,17 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    if (!isLoading) {
-      navigate(
-        userInfo
-          ? window.location.pathname === "/auth"
-            ? "/"
-            : window.location.pathname
-          : "/auth"
-      );
+    if (isLoading) return;
+
+    const isCertificateRoute =
+      window.location.pathname.startsWith("/certificate");
+
+    if (isCertificateRoute) return;
+
+    if (!userInfo) {
+      navigate("/auth");
+    } else if (window.location.pathname === "/auth") {
+      navigate("/");
     }
   }, [isLoading, userInfo, navigate]);
 
@@ -43,6 +47,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/certificate/:id" element={<Certificate />} />
           <Route path="/users" element={<Users />} />
           <Route path="/group/:id" element={<Group />} />
         </Routes>

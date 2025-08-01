@@ -78,31 +78,49 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { QRCodeCanvas } from "qrcode.react";
+
+const initialValue = {
+  category: "",
+  startDate: "",
+  endDate: "",
+  hours: "",
+  registerNumber: "",
+};
 
 const Group = () => {
+  const [certificateLoading, setCertificateLoading] = useState(false);
+  const [isCertificateOpen, setIsCertificateOpen] = useState(false);
+  const [isUpdadeModalOpen, setIsUpdadeModalOpen] = useState(false);
   const [isStudentsOpen, setisStudentsOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(Date.now);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [student, setStudent] = useState(initialValue);
+  const [certificate, setCertificate] = useState(null);
   const [isAddTopic, setisAddTopic] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isTopic, setIsTopic] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [isUpdadeModalOpen, setIsUpdadeModalOpen] = useState(false);
   const [members, setMembers] = useState([]);
   const [userId, setUserId] = useState(null);
   const [topicId, setTopicId] = useState();
   const [topics, setTopics] = useState([]);
-  const [isTopic, setIsTopic] = useState(false);
+  const canvasRef = useRef();
 
   const { users, getUsers } = useUsers();
   const { userInfo } = useAuth();
-  const inputRef = useRef();
-  const { id } = useParams();
   const navigate = useNavigate();
+  const { id } = useParams();
+  const inputRef = useRef();
 
   const toggleStudents = () => setisStudentsOpen(!isStudentsOpen);
   const toggleAddModal = () => setisAddTopic(!isAddTopic);
   const toggleTopicModal = () => setIsTopic(!isTopic);
   const toggleModal = () => setIsOpen(!isOpen);
+  const toggleCertificateModal = (id) => {
+    setUserId(id);
+    setIsCertificateOpen(!isDeleteOpen);
+  };
   const toggleDeleteModal = (id) => {
     setUserId(id);
     setIsDeleteOpen(!isDeleteOpen);
@@ -294,6 +312,26 @@ const Group = () => {
     }
   };
 
+  const handleCreateCertificate = async () => {
+    setCertificateLoading(true);
+    try {
+      const { data } = await axiosIntense.post("/certificate", {
+        ...student,
+        studentId: userId,
+      });
+      setCertificate(data.data.certificate);
+      setStudent(initialValue)
+    } catch (error) {
+      toast.error(
+        error.response.data.message ||
+          "Nimadir hato keti. Iltimos boshidan urunib ko'ring."
+      );
+      console.log(error);
+    } finally {
+      setCertificateLoading(false);
+    }
+  };
+
   useEffect(() => {
     return () => {
       document.body.style.removeProperty("pointer-events");
@@ -303,6 +341,20 @@ const Group = () => {
   if (isPending) {
     return <GroupSkeleton />;
   }
+
+  const downloadQRCode = () => {
+    const canvas = canvasRef.current?.querySelector("canvas");
+    if (!canvas) {
+      console.error("Canvas not found");
+      return;
+    }
+
+    const url = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "certificate-qr.png";
+    link.click();
+  };
 
   return (
     <>
@@ -597,10 +649,136 @@ const Group = () => {
               loading={loading}
               handleCheck={handleCheck}
               toggleDeleteModal={toggleDeleteModal}
+              toggleCertificateModal={toggleCertificateModal}
             />
           </div>
         </SheetContent>
       </Sheet>
+
+      <Dialog open={isCertificateOpen} onOpenChange={setIsCertificateOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Sertifikat Malumotlari</DialogTitle>
+          </DialogHeader>
+
+          <div className="grid grid-cols-2 gap-4 py-4">
+            {/* Category */}
+            <div className="grid grid-cols-2 items-center gap-4">
+              <label className="text-sm font-medium col-span-1">Category</label>
+              <Input
+                type="text"
+                value={student.category}
+                onChange={(e) =>
+                  setStudent({ ...student, category: e.target.value })
+                }
+                className="col-span-3"
+              />
+            </div>
+
+            {/* Start Date */}
+            <div className="grid grid-cols-2 items-center gap-4">
+              <label className="text-sm font-medium col-span-1">
+                Boshlangan sana
+              </label>
+              <Input
+                type="date"
+                value={student.startDate}
+                onChange={(e) =>
+                  setStudent({ ...student, startDate: e.target.value })
+                }
+                className="col-span-3"
+              />
+            </div>
+
+            {/* End Date */}
+            <div className="grid grid-cols-2 items-center gap-4">
+              <label className="text-sm font-medium col-span-1">
+                Tugagan sana
+              </label>
+              <Input
+                type="date"
+                value={student.endDate}
+                onChange={(e) =>
+                  setStudent({ ...student, endDate: e.target.value })
+                }
+                className="col-span-3"
+              />
+            </div>
+
+            {/* Hours */}
+            <div className="grid grid-cols-2 items-center gap-4">
+              <label className="text-sm font-medium col-span-1">Soatlar</label>
+              <Input
+                type="number"
+                value={student.hours}
+                onChange={(e) =>
+                  setStudent({ ...student, hours: e.target.value })
+                }
+                className="col-span-3"
+              />
+            </div>
+
+            {/* Register Number */}
+            <div className="grid grid-cols-2 items-center gap-4">
+              <label className="text-sm font-medium col-span-1">Reg. No.</label>
+              <Input
+                type="text"
+                value={student.registerNumber}
+                onChange={(e) =>
+                  setStudent({ ...student, registerNumber: e.target.value })
+                }
+                className="col-span-3"
+              />
+            </div>
+          </div>
+          <div className="mx-auto">
+            {certificate && (
+              <>
+                <div ref={canvasRef}>
+                  <QRCodeCanvas
+                    value={`${BASE_URL}certificate/${certificate._id}`}
+                    size={250}
+                    bgColor="#18181b"
+                    fgColor="white"
+                    includeMargin={true}
+                  />
+                </div>
+                <div className="space-x-2 flex items-center">
+                  <Button
+                    className="mt-2 mx-auto"
+                    variant="outline"
+                    onClick={downloadQRCode}
+                  >
+                    Download QR Code
+                  </Button>
+                  <Link
+                    className="text-blue-500 underline"
+                    target="_blank"
+                    to={`${BASE_URL}certificate/${certificate._id}`}
+                  >
+                    Link
+                  </Link>
+                </div>
+              </>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button
+              onClick={handleCreateCertificate}
+              disabled={certificateLoading}
+            >
+              {certificateLoading ? "Saqlanmoqda..." : "Saqlash"}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => setIsCertificateOpen(false)}
+            >
+              Yopish
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog
         open={isUpdadeModalOpen}

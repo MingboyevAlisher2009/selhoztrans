@@ -6,6 +6,7 @@ import { body, validationResult } from "express-validator";
 import Group from "../models/group.model.js";
 import Attending from "../models/attending.model.js";
 import axios from "axios";
+import Certificate from "../models/certificates.model.js";
 
 export const loginValidation = [
   body("email").isEmail().withMessage("Please enter a valid email"),
@@ -380,6 +381,29 @@ export const getUsers = async (req, res, next) => {
       },
     ]);
 
+    const certificateStats = await Certificate.aggregate([
+      {
+        $match: {
+          student: { $in: userIds },
+        },
+      },
+      {
+        $group: {
+          _id: "$student",
+          certificateCount: { $sum: 1 },
+          certificates: {
+            $push: {
+              _id: "$_id",
+              course: "$course",
+              date: "$date",
+              certificate: "$certificate",
+              createdAt: "$createdAt",
+            },
+          },
+        },
+      },
+    ]);
+
     const usersWithStats = users.map((user) => {
       const attendance = attendanceStats.find(
         (stat) => stat._id.toString() === user._id.toString()
@@ -396,14 +420,23 @@ export const getUsers = async (req, res, next) => {
         groups: [],
       };
 
+      const certData = certificateStats.find(
+        (cert) => cert._id.toString() === user._id.toString()
+      ) || {
+        certificateCount: 0,
+        certificates: [],
+      };
+
       return {
         _id: user._id,
         username: user.username,
         email: user.email,
         imageUrl: user.imageUrl,
         role: user.role,
+
         groupCount: groupData.groupCount,
         groups: groupData.groups,
+
         attendance: {
           totalSessions: attendance.totalSessions,
           attendedSessions: attendance.attendedSessions,
@@ -411,6 +444,9 @@ export const getUsers = async (req, res, next) => {
             attendance.attendancePercentage
           ).toFixed(2),
         },
+
+        certificateCount: certData.certificateCount,
+        certificates: certData.certificates,
       };
     });
 

@@ -1,4 +1,5 @@
 import {
+  Car,
   Edit,
   Home,
   ImagePlus,
@@ -9,7 +10,7 @@ import {
   Users,
   X,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useEffect, useState } from "react";
 
@@ -72,6 +73,7 @@ export function AppSidebar({ children }) {
   const [isOpen, setIsOpenState] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const { pathname } = useLocation();
   const [form, setForm] = useState({
     imageUrl: (userInfo && userInfo.imageUrl) || "",
     email: userInfo?.email || "",
@@ -96,7 +98,6 @@ export function AppSidebar({ children }) {
   );
 
   const isDark = theme === "dark";
-  const pathname = window.location.pathname;
 
   const handleInputChange = useCallback((e) => {
     const { id, value, files } = e.target;
@@ -209,214 +210,222 @@ export function AppSidebar({ children }) {
     return children;
   }
 
+  const locations = ["/auth", "/certificate"];
+
   return (
     <>
-      <Sidebar>
-        <SidebarContent>
-          <SidebarGroup>
-            <SidebarGroupLabel className="flex items-center gap-2 px-2 text-xl font-semibold tracking-tight">
-              <div className="rounded-md bg-primary/10 p-1">
-                <Users className="h-5 w-5 text-primary" />
+      {locations.some((loc) => pathname.startsWith(loc)) ? (
+        <main className="w-full">{children}</main>
+      ) : (
+        <>
+          <Sidebar>
+            <SidebarContent>
+              <SidebarGroup>
+                <SidebarGroupLabel className="flex items-center gap-2 px-2 text-xl font-semibold tracking-tight">
+                  <div className="rounded-md bg-primary/10 p-1">
+                    <Car className="h-5 w-5 text-primary" />
+                  </div>
+                  Selhoz Trans
+                </SidebarGroupLabel>
+                <SidebarGroupContent className="mt-4">
+                  <SidebarMenu>
+                    {navigationItems.map((item) => {
+                      const isActive = pathname === item.url;
+                      return (
+                        <SidebarMenuItem key={item.title}>
+                          <SidebarMenuButton
+                            asChild
+                            isActive={isActive}
+                            className="h-11 gap-3 text-base hover:bg-secondary"
+                          >
+                            <Link to={item.url}>
+                              <item.icon className="h-5 w-5" />
+                              <span>{item.title}</span>
+                            </Link>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      );
+                    })}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            </SidebarContent>
+          </Sidebar>
+
+          <SidebarInset>
+            <header className="flex h-16 shrink-0 items-center border-b px-4">
+              <div className="flex w-full items-center justify-between">
+                <SidebarTrigger />
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="group flex items-center gap-3 rounded-lg p-2 outline-none hover:bg-secondary">
+                      <Avatar>
+                        <AvatarImage
+                          className="bg-cover object-cover"
+                          src={
+                            userInfo?.imageUrl
+                              ? `${BASE_URL}${userInfo.imageUrl}`
+                              : ""
+                          }
+                          alt="User avatar"
+                        />
+                        <AvatarFallback>
+                          <User2 />
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="text-left">
+                        <h3 className="text-sm font-medium leading-none">
+                          {userInfo?.username}
+                        </h3>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {userInfo?.email}
+                        </p>
+                      </div>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-72">
+                    <DropdownMenuLabel>Mening hisobim</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      className="cursor-default gap-3 p-3"
+                      onSelect={(e) => e.preventDefault()}
+                    >
+                      <div className="flex flex-1 items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          {isDark ? (
+                            <Sun className="h-4 w-4" />
+                          ) : (
+                            <Moon className="h-4 w-4" />
+                          )}
+                          <span>{isDark ? "Kunki rejim" : "Tungi rejim"}</span>
+                        </div>
+                        <Switch
+                          checked={isDark}
+                          onCheckedChange={() =>
+                            setTheme(isDark ? "light" : "dark")
+                          }
+                        />
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setIsOpen(true)}
+                      className="gap-3 p-3"
+                    >
+                      <Edit className="h-4 w-4" />
+                      Tahrirlash
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={logout}
+                      className="gap-3 p-3 text-destructive focus:bg-destructive focus:text-destructive-foreground"
+                    >
+                      <LogIn className="h-4 w-4" />
+                      {isPending ? "Yuklanmoqda..." : "Chiqish"}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
-              Project
-            </SidebarGroupLabel>
-            <SidebarGroupContent className="mt-4">
-              <SidebarMenu>
-                {navigationItems.map((item) => {
-                  const isActive = pathname === item.url;
-                  return (
-                    <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton
-                        asChild
-                        isActive={isActive}
-                        className="h-11 gap-3 text-base hover:bg-secondary"
-                      >
-                        <Link to={item.url}>
-                          <item.icon className="h-5 w-5" />
-                          <span>{item.title}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        </SidebarContent>
-      </Sidebar>
+            </header>
+            <main className="p-6">{children}</main>
+          </SidebarInset>
 
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center border-b px-4">
-          <div className="flex w-full items-center justify-between">
-            <SidebarTrigger />
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="group flex items-center gap-3 rounded-lg p-2 outline-none hover:bg-secondary">
-                  <Avatar>
-                    <AvatarImage
-                      className="bg-cover object-cover"
-                      src={
-                        userInfo?.imageUrl
-                          ? `${BASE_URL}${userInfo.imageUrl}`
-                          : ""
-                      }
-                      alt="User avatar"
-                    />
-                    <AvatarFallback>
-                      <User2 />
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="text-left">
-                    <h3 className="text-sm font-medium leading-none">
-                      {userInfo?.username}
-                    </h3>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {userInfo?.email}
-                    </p>
-                  </div>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-72">
-                <DropdownMenuLabel>Mening hisobim</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="cursor-default gap-3 p-3"
-                  onSelect={(e) => e.preventDefault()}
-                >
-                  <div className="flex flex-1 items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      {isDark ? (
-                        <Sun className="h-4 w-4" />
-                      ) : (
-                        <Moon className="h-4 w-4" />
-                      )}
-                      <span>{isDark ? "Kunki rejim" : "Tungi rejim"}</span>
-                    </div>
-                    <Switch
-                      checked={isDark}
-                      onCheckedChange={() =>
-                        setTheme(isDark ? "light" : "dark")
-                      }
-                    />
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => setIsOpen(true)}
-                  className="gap-3 p-3"
-                >
-                  <Edit className="h-4 w-4" />
-                  Tahrirlash
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={logout}
-                  className="gap-3 p-3 text-destructive focus:bg-destructive focus:text-destructive-foreground"
-                >
-                  <LogIn className="h-4 w-4" />
-                  {isPending ? "Yuklanmoqda..." : "Chiqish"}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </header>
-        <main className="p-6">{children}</main>
-      </SidebarInset>
-
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Tahrirlash</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div
-              className={`relative group cursor-pointer ${
-                isDragging ? "border-primary" : "border-border"
-              } border-2 border-dashed rounded-lg transition-colors duration-200`}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-            >
-              {previewUrl ? (
-                <div className="relative aspect-video">
-                  <img
-                    className="w-full h-full rounded-lg object-cover"
-                    src={previewUrl || "/placeholder.svg"}
-                    alt="Preview"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleImageClear}
-                    className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 hover:bg-background transition-colors"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              ) : (
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Tahrirlash</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
                 <div
-                  onClick={handleImageClick}
-                  className="aspect-video flex flex-col items-center justify-center gap-4 text-muted-foreground hover:text-foreground transition-colors"
+                  className={`relative group cursor-pointer ${
+                    isDragging ? "border-primary" : "border-border"
+                  } border-2 border-dashed rounded-lg transition-colors duration-200`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
                 >
-                  <div className="p-4 rounded-full bg-secondary">
-                    <ImagePlus className="h-6 w-6" />
-                  </div>
-                  <div className="text-center space-y-1">
-                    <p className="text-sm font-medium">
-                      Drag and drop your image here, or click to select
-                    </p>
-                    <p className="text-xs">Supports: JPG, PNG, GIF</p>
-                  </div>
+                  {previewUrl ? (
+                    <div className="relative aspect-video">
+                      <img
+                        className="w-full h-full rounded-lg object-cover"
+                        src={previewUrl || "/placeholder.svg"}
+                        alt="Preview"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleImageClear}
+                        className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 hover:bg-background transition-colors"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div
+                      onClick={handleImageClick}
+                      className="aspect-video flex flex-col items-center justify-center gap-4 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <div className="p-4 rounded-full bg-secondary">
+                        <ImagePlus className="h-6 w-6" />
+                      </div>
+                      <div className="text-center space-y-1">
+                        <p className="text-sm font-medium">
+                          Drag and drop your image here, or click to select
+                        </p>
+                        <p className="text-xs">Supports: JPG, PNG, GIF</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
 
-            <div>
-              <Label htmlFor="email" className="text-right">
-                Email
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="example@gmail.com"
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, email: e.target.value }))
-                }
-                value={form.email}
-                className="col-span-3"
-              />
-            </div>
+                <div>
+                  <Label htmlFor="email" className="text-right">
+                    Email
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="example@gmail.com"
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, email: e.target.value }))
+                    }
+                    value={form.email}
+                    className="col-span-3"
+                  />
+                </div>
 
-            <div>
-              <Label htmlFor="username" className="text-right">
-                Foydalanuvchi nomi
-              </Label>
-              <Input
-                id="username"
-                placeholder="username"
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, username: e.target.value }))
-                }
-                value={form.username}
-                className="col-span-3"
-              />
-            </div>
-          </div>
+                <div>
+                  <Label htmlFor="username" className="text-right">
+                    Foydalanuvchi nomi
+                  </Label>
+                  <Input
+                    id="username"
+                    placeholder="username"
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, username: e.target.value }))
+                    }
+                    value={form.username}
+                    className="col-span-3"
+                  />
+                </div>
+              </div>
 
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="destructive" type="button">
-                Yopish
-              </Button>
-            </DialogClose>
-            <Button
-              type="submit"
-              disabled={!form.username || !form.email}
-              onClick={handleSubmit}
-            >
-              Saqlash
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="destructive" type="button">
+                    Yopish
+                  </Button>
+                </DialogClose>
+                <Button
+                  type="submit"
+                  disabled={!form.username || !form.email}
+                  onClick={handleSubmit}
+                >
+                  Saqlash
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </>
+      )}
     </>
   );
 }

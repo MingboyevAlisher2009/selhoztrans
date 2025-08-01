@@ -1,5 +1,4 @@
 "use client";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,14 +17,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { BASE_URL } from "@/http/api";
 import { isBefore, startOfDay } from "date-fns";
-import { MoreHorizontal, Trash, User } from "lucide-react";
+import { File, MoreHorizontal, Trash, User } from "lucide-react";
 import AttendanceStatus from "./attendance-status";
 import { motion, AnimatePresence } from "framer-motion";
+import { BASE_URL } from "@/http/api";
 
 export function GroupTable({
   toggleDeleteModal,
+  toggleCertificateModal,
   data,
   date,
   handleCheck,
@@ -53,7 +53,6 @@ export function GroupTable({
         };
     handleCheck(updateStatus);
   };
-
   return (
     <div className="rounded-md border">
       <Table>
@@ -63,6 +62,7 @@ export function GroupTable({
             <TableHead>Tafsilotlar</TableHead>
             <TableHead>Role</TableHead>
             <TableHead>Holati</TableHead>
+            <TableHead>Sertifikatlar</TableHead> {/* New Table Head */}
             <TableHead>Davomat</TableHead>
             <TableHead className="w-[50px]"></TableHead>
           </TableRow>
@@ -71,7 +71,9 @@ export function GroupTable({
           <AnimatePresence>
             {!data?.members || data.members.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-4">
+                <TableCell colSpan={7} className="text-center py-4">
+                  {" "}
+                  {/* Updated colSpan */}
                   No students found
                 </TableCell>
               </TableRow>
@@ -130,6 +132,29 @@ export function GroupTable({
                       <AttendanceStatus status={member.attendance.status} />
                     </TableCell>
                     <TableCell>
+                      {" "}
+                      {member.certificates && member.certificates.length > 0 ? (
+                        <div className="flex flex-col gap-1">
+                          {member.certificates.map((cert) => (
+                            <a
+                              key={cert._id}
+                              href={`${BASE_URL}${cert.certificate}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1 text-sm text-primary hover:underline"
+                            >
+                              <File className="h-4 w-4" />
+                              <span>Download Certificate</span>
+                            </a>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-sm text-muted-foreground">
+                          No certificates
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell>
                       <div className="flex items-center gap-2">
                         <Switch
                           disabled={disabled || loading}
@@ -168,6 +193,12 @@ export function GroupTable({
                           >
                             <Trash className="mr-2 h-4 w-4" />
                             Remove member
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => toggleCertificateModal(member._id)}
+                          >
+                            <File className="w-4 h-4 mr-2" />
+                            Sertifikat qushish
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
