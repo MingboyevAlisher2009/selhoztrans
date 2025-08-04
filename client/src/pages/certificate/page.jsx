@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BASE_URL } from "@/http/api";
 import axiosIntense from "@/http/axios";
@@ -168,6 +169,31 @@ const Certificate = () => {
             >
               📄 PDF Sertifikatni Yuklab Olish
             </Button>
+
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="ml-4 px-8 py-3 text-lg font-semibold rounded-xl shadow-md"
+                >
+                  👁️ Sertifikatni Ko‘rish
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="w-full max-w-5xl h-[90vh] overflow-hidden p-4">
+                <DialogHeader>
+                  <DialogTitle className="text-xl">
+                    Sertifikat Preview
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="h-full w-full">
+                  <iframe
+                    src={`${BASE_URL}${certificate.certificate}`}
+                    className="w-full h-[80vh] rounded border"
+                    title="PDF Preview"
+                  ></iframe>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </div>

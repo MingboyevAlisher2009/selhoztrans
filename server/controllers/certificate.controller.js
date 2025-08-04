@@ -56,10 +56,11 @@ export const generateUzCertificate = async (req, res) => {
     const fontSize = 18;
     const textWidth = font.widthOfTextAtSize(text, fontSize);
     const textHourWidth = font.widthOfTextAtSize(hours, 14);
-
+    console.log(registerNumber);
+    
     page.drawText(`${certificate._id.toString().slice(-6).toUpperCase()}`, {
-      x: width / 2 - 15,
-      y: height - 240,
+      x: width / 2 - 14,
+      y: height - 288,
       size: 12,
       font,
       color: rgb(0, 0, 0),
@@ -67,40 +68,40 @@ export const generateUzCertificate = async (req, res) => {
 
     page.drawText(text, {
       x: (width - textWidth) / 2,
-      y: height - 270,
+      y: height - 315,
       size: fontSize,
       font,
       color: rgb(0.2, 0.2, 0.3),
     });
 
-    page.drawText(`${startDate}           ${endDate}`, {
-      x: width - 372,
-      y: height - 300,
+    page.drawText(`${startDate}                ${endDate}`, {
+      x: width - 373,
+      y: height - 346,
       size: 12,
       font,
       color: rgb(0, 0, 0),
     });
 
     page.drawText(category, {
-      x: 115,
-      y: height - 325,
+      x: 135,
+      y: height - 372,
       size: 14,
       font,
       color: rgb(0, 0, 0),
     });
 
     page.drawText(hours, {
-      x: width - textHourWidth - 297,
-      y: height - 325,
+      x: width - textHourWidth - 313,
+      y: height - 373,
       size: 14,
       font,
       color: rgb(0, 0, 0),
     });
 
     page.drawText(registerNumber, {
-      x: width - 170,
-      y: height - 370,
-      size: 12,
+      x: width - 160,
+      y: height - 405,
+      size: 10,
       font,
       color: rgb(0, 0, 0),
     });
@@ -112,8 +113,8 @@ export const generateUzCertificate = async (req, res) => {
     const qrImage = await pdfDoc.embedPng(qrBytes);
 
     page.drawImage(qrImage, {
-      x: 50,
-      y: 50,
+      x: 80,
+      y: 80,
       width: 90,
       height: 90,
     });
